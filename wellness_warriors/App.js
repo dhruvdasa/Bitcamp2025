@@ -4,10 +4,10 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import JournalScreen from './screens/Journal';
 import JournalCalendarScreen from './screens/JournalCalendar';
+import Grounding from './screens/Grounding';
 
 const SleepScreen = () => <Screen title="😴 Sleep Tracker" />;
 const HallucinationScreen = () => <Screen title="👁️ Hallucination Breaker" />;
-const GroundingScreen = () => <Screen title="🌱 Grounding Tool" />;
 
 const Stack = createNativeStackNavigator();
 
@@ -20,7 +20,7 @@ export default function App() {
         <Stack.Screen name="Journal" component={JournalScreen} options={{ title: 'New Journal Entry' }} />
         <Stack.Screen name="Sleep" component={SleepScreen} />
         <Stack.Screen name="Hallucination" component={HallucinationScreen} />
-        <Stack.Screen name="Grounding" component={GroundingScreen} />
+        <Stack.Screen name="Grounding" component={Grounding} options={{ title: 'Grounding' }} />
       </Stack.Navigator>
     </NavigationContainer>
   );

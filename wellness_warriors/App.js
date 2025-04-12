@@ -5,6 +5,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import JournalScreen from './screens/Journal';
 import JournalCalendarScreen from './screens/JournalCalendar';
 import Grounding from './screens/Grounding';
+import TrendReportScreen from './screens/TrendReportScreen';
+
 
 const SleepScreen = () => <Screen title="😴 Sleep Tracker" />;
 const HallucinationScreen = () => <Screen title="👁️ Hallucination Breaker" />;
@@ -15,12 +17,13 @@ export default function App() {
   return (
     <NavigationContainer>
       <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: true, headerStyle: { backgroundColor: '#a7d7c5' } }}>
-        <Stack.Screen name="Home" component={HomeScreen} options={{ title: 'Wellness Warriors 🌿' }} />
-        <Stack.Screen name="JournalCalendar" component={JournalCalendarScreen} options={{ title: 'Journal Calendar' }} />
-        <Stack.Screen name="Journal" component={JournalScreen} options={{ title: 'New Journal Entry' }} />
-        <Stack.Screen name="Sleep" component={SleepScreen} />
-        <Stack.Screen name="Hallucination" component={HallucinationScreen} />
-        <Stack.Screen name="Grounding" component={Grounding} options={{ title: 'Grounding' }} />
+      <Stack.Screen name="Home" component={HomeScreen} />
+      <Stack.Screen name="JournalCalendar" component={JournalCalendarScreen} />
+      <Stack.Screen name="Journal" component={JournalScreen} />
+      <Stack.Screen name="TrendReport" component={TrendReportScreen} options={{ title: 'Trend Report' }} />
+      <Stack.Screen name="Sleep" component={SleepScreen} />
+      <Stack.Screen name="Hallucination" component={HallucinationScreen} />
+      <Stack.Screen name="Grounding" component={Grounding} />
       </Stack.Navigator>
     </NavigationContainer>
   );

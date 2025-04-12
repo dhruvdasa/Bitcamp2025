@@ -1,0 +1,33 @@
+mental-health-app/
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   │   └── README.md                # Reusable UI components
+│   │   ├── features/
+│   │   │   ├── journal/
+│   │   │   │   └── README.md            # Diary + Gemini analysis feature
+│   │   │   ├── sleep-tracker/
+│   │   │   │   └── README.md            # Sleep input + notification logic
+│   │   │   ├── hallucination/
+│   │   │   │   └── README.md            # Hallucination breaker w/ CV
+│   │   │   ├── grounding/
+│   │   │   │   └── README.md            # Grounding tool using photo tasks
+│   │   ├── App.jsx
+│   │   └── main.jsx
+│   ├── package.json
+│   └── README.md
+│
+├── backend/
+│   ├── src/
+│   │   └── index.ts                     # Cloudflare Worker to call Gemini API
+│   ├── wrangler.toml                   # Worker config
+│   └── README.md
+│
+├── docs/
+│   ├── prompts.md                      # Drafts of prompts sent to Gemini
+│   └── wireframes.md                   # UI sketches or links to mockups
+│
+├── .gitignore
+├── README.md                           # Project overview
+└── LICENSE

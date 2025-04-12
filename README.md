@@ -1,1 +1,2 @@
 # Bitcamp2025
+WELLNESS APP

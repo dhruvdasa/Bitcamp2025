@@ -1,33 +1,25 @@
-mental-health-app/
-├── frontend/
-│   ├── public/
-│   ├── src/
-│   │   ├── components/
-│   │   │   └── README.md                # Reusable UI components
-│   │   ├── features/
-│   │   │   ├── journal/
-│   │   │   │   └── README.md            # Diary + Gemini analysis feature
-│   │   │   ├── sleep-tracker/
-│   │   │   │   └── README.md            # Sleep input + notification logic
-│   │   │   ├── hallucination/
-│   │   │   │   └── README.md            # Hallucination breaker w/ CV
-│   │   │   ├── grounding/
-│   │   │   │   └── README.md            # Grounding tool using photo tasks
-│   │   ├── App.jsx
-│   │   └── main.jsx
-│   ├── package.json
+mental-health-app/               ← Your main GitHub repo
+├── mobile/                      ← Your React Native app (was "frontend")
+│   ├── App.js                   ← Main app file (navigation goes here)
+│   ├── package.json             ← Project config and dependencies
+│   ├── screens/                 ← Your 4 core feature screens
+│   │   ├── Journal.js           ← Journal + Gemini LLM
+│   │   ├── SleepTracker.js      ← Sleep input + notifications
+│   │   ├── Hallucination.js     ← CV-based hallucination breaker
+│   │   └── Grounding.js         ← Grounding photo task flow
+│   ├── assets/                  ← App icons, images, etc.
 │   └── README.md
 │
-├── backend/
+├── backend/                     ← Cloudflare Worker for Gemini API
 │   ├── src/
-│   │   └── index.ts                     # Cloudflare Worker to call Gemini API
-│   ├── wrangler.toml                   # Worker config
+│   │   └── index.ts             ← Gemini proxy logic
+│   ├── wrangler.toml           ← Worker config
 │   └── README.md
 │
-├── docs/
-│   ├── prompts.md                      # Drafts of prompts sent to Gemini
-│   └── wireframes.md                   # UI sketches or links to mockups
+├── docs/                        ← Notes, prompt drafts, wireframes
+│   ├── prompts.md
+│   └── wireframes.md
 │
 ├── .gitignore
-├── README.md                           # Project overview
+├── README.md                   ← Project overview
 └── LICENSE

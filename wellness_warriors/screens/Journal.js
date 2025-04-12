@@ -3,6 +3,8 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Text, TextInput, Button, StyleSheet, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, ScrollView, Alert} from 'react-native';
 
 export default function JournalScreen() {
+
+  
   const [entry, setEntry] = useState('');
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
@@ -29,12 +31,17 @@ export default function JournalScreen() {
       const supportiveMatch = fullResponse.match(/\*Supportive Message:\*(.*?)($|\*|$)/s);
       const supportiveMessage = supportiveMatch ? supportiveMatch[1].trim() : fullResponse;
 
+      
+      const moodMatch = fullResponse.match(/\*Mood Score:\*\s*([-\d.]+)/);
+      const moodScore = moodMatch ? parseFloat(moodMatch[1]) : 0;
+
       setResponse(supportiveMessage || 'No analysis returned.');
       const message = data.message
     
       const storageKey = `entry-${date}-${time}`;
       const savedData = {
         entry,
+        moodScore,
         timestamp,
         fullResponse,
         supportiveMessage, // AI response

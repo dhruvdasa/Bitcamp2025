@@ -1,4 +1,7 @@
 import React, { useState, useEffect } from 'react';
+import { useFocusEffect } from '@react-navigation/native';
+import { useCallback } from 'react';
+
 import {
   View,
   Text,
@@ -19,20 +22,43 @@ export default function JournalCalendarScreen() {
   const [entriesForDay, setEntriesForDay] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
 
-  useEffect(() => {
-    loadMarkedDates();
-  }, []);
+  useFocusEffect(
+    useCallback(() => {
+      loadMarkedDates();
+    }, [])
+  );
+
+  const getMoodColor = (score) => {
+      if (score <= -0.6) return '#FF6B6B'; // red
+      if (score <= -0.2) return '#FFAA64'; // orange
+      if (score <= 0.2) return '#FFE066'; // yellow
+      if (score <= 0.6) return '#A2D2FF'; // light blue
+      return '#88E0A4'; // green
+    };
 
   const loadMarkedDates = async () => {
     const keys = await AsyncStorage.getAllKeys();
     const journalKeys = keys.filter((key) => key.startsWith('entry-'));
 
     const dates = {};
+
     for (let key of journalKeys) {
-      const date = key.split('-').slice(1, 4).join('-'); // "YYYY-MM-DD"
-      // mark as selected with neutral color for now
-      dates[date] = { selected: true, selectedColor: '#90CAF9' };
+        const date = key.split('-').slice(1, 4).join('-'); // e.g. "2025-04-13"
+        const raw = await AsyncStorage.getItem(key);
+        if (!raw) continue;
+
+        const entry = JSON.parse(raw);
+        const mood = entry.moodScore ?? 0; // fallback to neutral
+        const moodColor = getMoodColor(mood);
+
+        if (!dates[date]) {
+        dates[date] = { dots: [] };
+        }
+
+        dates[date].dots.push({ color: moodColor });
+        dates[date].marked = true;
     }
+
     setMarkedDates(dates);
   };
 
@@ -56,6 +82,7 @@ export default function JournalCalendarScreen() {
 
       <Calendar
         markedDates={markedDates}
+        markingType={'multi-dot'}
         onDayPress={(day) => {
           loadEntriesForDate(day.dateString);
         }}
@@ -66,6 +93,10 @@ export default function JournalCalendarScreen() {
         onPress={() => navigation.navigate('Journal')}
       >
         <Text style={styles.buttonText}>➕ New Entry</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TrendReport')}>
+         <Text style={styles.buttonText}>📊 Weekly Report</Text>
       </TouchableOpacity>
 
       <Modal
@@ -86,7 +117,7 @@ export default function JournalCalendarScreen() {
                 minute: '2-digit',
               });
               return (
-                <View key={i} style={styles.entryBlock}>
+                <View key={i} style={[styles.entryBlock, { backgroundColor: getMoodColor(entry.moodScore)}]}>
                   <Text style={styles.entryTime}>{time}</Text>
                   <Text style={styles.entryText}>📝 {entry.entry}</Text>
                   <Text style={styles.responseText}>💬 {entry.supportiveMessage || '—'}</Text>

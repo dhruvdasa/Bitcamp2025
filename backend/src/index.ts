@@ -6,9 +6,62 @@ export interface Env {
 	entry: string;
 	timestamp: string;
   }
+
+  interface TrendLog {
+	entry: string;
+	moodScore: number;
+	timestamp: string;
+	supportiveMessage: string;
+  }
+
+  type GeminiResponse = {
+	candidates?: Array<{
+	  content?: {
+		parts?: Array<{
+		  text?: string;
+		}>
+	  }
+	}>
+  };
   
   export default {
 	async fetch(request: Request, env: Env): Promise<Response> {
+	const url = new URL(request.url);
+
+	if (request.method === 'POST' && url.pathname === '/report') {
+		const body = await request.json() as { logs: TrendLog[] };
+		const { logs } = body;  // expect [{ entry, moodScore, timestamp, fullResponse, supportiveMessage}]
+		const entriesText = logs.map((log, i) => `Entry ${i + 1} (${log.timestamp}):\n${log.entry}`).join('\n\n');
+		
+		const prompt = `
+		You are a compassionate mental health assistant analyzing 5 recent journal entries from a user.
+		
+		Please:
+		1. Identify emotional trends and provide an average *Mood Score* (range: -1 to +1).
+		2. Offer gentle courses of action and ALWAYS recommend talking to a licensed mental health professional.
+		3. If there are any delusional or psychosis-like elements (fantasy, ghosts, aliens, conspiracies, paranoia, etc.), note the patterns or recurring themes in a respectful way.
+		4. End with mental health crisis resources: "If you're in crisis or need support, text 988 or call the Suicide & Crisis Lifeline."
+		
+		Here are the recent entries:
+		${entriesText}
+		`;
+		
+		const geminiRes = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${env.GEMINI_API_KEY}`, {
+			method: 'POST',
+			headers: {
+			'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+			contents: [{ parts: [{ text: prompt }] }],
+			}),
+		});
+		
+		const raw = await geminiRes.json() as GeminiResponse;
+		const report = raw.candidates?.[0]?.content?.parts?.[0]?.text || 'Could not generate report.';
+		return new Response(JSON.stringify({ report }), {
+			headers: { 'Content-Type': 'application/json' },
+		});
+	  }
 	  if (request.method !== 'POST') {
 		return new Response('Only POST allowed', { status: 405 });
 	  }
@@ -41,7 +94,7 @@ export interface Env {
 -  0 = neutral
 - +1 = calm or positive
 
-  Please respond with the following format, make sure to include these headers:
+  Please respond with the following format, make sure to include these headers, also put the mood score at the end of the supportive message as well as under the designated header:
 	*Tone:* ...
 	*Emotional Stress:* ...
 	*Analysis:* ...

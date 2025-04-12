@@ -1,1 +1,3 @@
-
+name = "backend"            # or any unique worker name
+main = "index.js"               # this is your entry point file
+compatibility_date = "2025-04-12"

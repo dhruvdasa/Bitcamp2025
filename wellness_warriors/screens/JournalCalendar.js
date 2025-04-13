@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useFocusEffect } from '@react-navigation/native';
 import { useCallback } from 'react';
+import BackButton from '../assets/Backbutton'
 
 import {
   View,
@@ -88,6 +89,9 @@ export default function JournalCalendarScreen() {
         }}
       />
 
+      {/* 🔙 Back to Home */}
+      <BackButton navigation={navigation} to="Home" />
+
       <TouchableOpacity
         style={styles.button}
         onPress={() => navigation.navigate('Journal')}
@@ -139,6 +143,7 @@ const styles = StyleSheet.create({
     paddingTop: 60,
   },
   title: {
+    paddingTop: 60,
     fontSize: 22,
     fontWeight: 'bold',
     marginBottom: 20,

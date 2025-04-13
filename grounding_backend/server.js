@@ -31,7 +31,7 @@ app.post('/analyze-image', async (req, res) => {
     console.log('🖼️ Image received:', base64?.substring(0, 50), '...');
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
-    const prompt = `First of all, I want you to identify the main object in the image (ignore background). Is this object primarily something of the characteristic ${promptChars}? Answer yes or no with a short reason, and encourage the user whether they are right or wrong.`;
+    const prompt = `First of all, I want you to identify the main object in the image (ignore background). Is this object primarily something of the characteristic ${promptChars}? Answer yes or no with a short reason, and encourage the user whether they are right or wrong. If the user has gotten multiple correct in a row, be more encouraging to the user.`;
 
     const imagePart = base64ToGenerativePart(base64, 'image/jpeg');
 

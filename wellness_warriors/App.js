@@ -7,7 +7,10 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import JournalScreen from './screens/Journal';
 import SleepTrackerScreen from './screens/SleepTracker';
 import Grounding from './screens/Grounding';
-import TrendReportScreen from './screens/TrendReportScreen';
+import TrendReportScreen from './screens/TrendReportScreen'
+import { Image } from 'react-native'
+import Panic from './screens/Panic'
+
 import FlowerScreen from './screens/FlowerGallery';
 
 // Context
@@ -44,6 +47,28 @@ export default function App() {
 const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
+      {/* Top logo */}
+      <Image source={require('./assets/AnchorLogowithWords.png')} style={styles.logo} />
+
+      {/* Bottom nav bar */}
+      <View style={styles.navBar}>
+        <TouchableOpacity onPress={() => navigation.navigate('JournalCalendar')}>
+          <Image source={require('./assets/Journal.png')} style={styles.icon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Sleep')}>
+          <Image source={require('./assets/SleepTracker.png')} style={styles.icon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Panic')}>
+          <Image source={require('./assets/SOS.png')} style={styles.icon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('Grounding')}>
+          <Image source={require('./assets/Grounding.png')} style={styles.icon} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate('FlowerGarden')}>
+          <Image source={require('./assets/FlowerGarden.png')} style={styles.icon} />
+        </TouchableOpacity>
+        
+      </View>
       <Text style={styles.title}>Welcome 🌼</Text>
 
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Journal')}>
@@ -78,7 +103,7 @@ const HomeScreen = ({ navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#eafaf1',
+    backgroundColor: '#fffdfa',
     alignItems: 'center',
     justifyContent: 'center',
     paddingHorizontal: 24,
@@ -86,7 +111,7 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 26,
     fontWeight: 'bold',
-    color: '#2f5d50',
+    color: '#00800',
     marginBottom: 20,
   },
   button: {
@@ -107,5 +132,47 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#1e3d34',
     fontWeight: '600',
+  },
+  screenContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#eafaf1',
+  },
+  screenText: {
+    fontSize: 24,
+    color: '#2f5d50',
+    fontWeight: 'bold',
+  },
+  logo: {
+    width: 280, // ⬆️ increase size slightly
+    height: 280,
+    resizeMode: 'contain',
+    marginTop: 5, // ⬆️ move up by reducing margin
+    marginBottom: 170,
+    alignSelf: 'center',
+  },
+  navBar: {
+    position: 'absolute',
+    bottom:  35, // 👈 raised slightly from bottom edge
+    left: 20,
+    right: 20,
+    height: 47,
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+    backgroundColor: '#f4e8d7',
+    borderRadius: 20,
+    elevation: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 6,
+    paddingBottom: 6.5,
+  },
+  icon: {
+    width: 40,
+    height: 40,
+    resizeMode: 'contain',
   },
 });

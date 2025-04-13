@@ -7,6 +7,7 @@
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
+    "plugins": ["expo-camera"],
     "splash": {
       "image": "./assets/splash-icon.png",
       "resizeMode": "contain",
@@ -23,6 +24,7 @@
     "ios": {
       "supportsTablet": true,
       "infoPlist": {
+
         "NSCameraUsageDescription": "This app uses the camera for grounding exercises"
       }
     },

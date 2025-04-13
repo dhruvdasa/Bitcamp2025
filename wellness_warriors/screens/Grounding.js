@@ -1,200 +1,171 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { CameraView, CameraType } from 'expo-camera';
+import React, { useState, useEffect } from 'react';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
+import { ImageBackground } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
 
-const prompts = [
-  "Find something red",
-  "Show me a flower",
-  "Point to the sky",
-  "Find something soft",
-  "Find something green",
-  "Find something round",
-  "Show me a cloud",
-  "Find something that smells good",
-];
+const prompts = ['orange', 'blue', 'gray', 'magenta', 'purple', 'round', 'smooth', 'multi-colored'];
 
-export default function Grounding() {
-  const [hasPermission, setHasPermission] = useState(null);
-  const [prompt, setPrompt] = useState('');
+const GroundingAI = () => {
+  const [promptChars, setPromptChars] = useState(null);
+  const [photo, setPhoto] = useState(null);
+  const [responseText, setResponseText] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
-    (async () => {
-      const { status } = await CameraView.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-    generateNewPrompt();
+    randomizePrompt();
   }, []);
 
-  const generateNewPrompt = () => {
-    const random = prompts[Math.floor(Math.random() * prompts.length)];
-    setPrompt(random);
+  const randomizePrompt = () => {
+    const char = prompts[Math.floor(Math.random() * prompts.length)];
+    setPromptChars(char);
+    setPhoto(null);
+    setResponseText(null);
   };
 
-  const takePicture = async () => {
-    try {
-      Alert.alert("Photo captured!", "You found something real! Great job grounding. 🌱");
-      generateNewPrompt(); // Give a new task
-    } catch (e) {
-      console.error(e);
-      Alert.alert("Error", "Could not take photo.");
+  const takePhoto = async () => {
+    const { status } = await ImagePicker.requestCameraPermissionsAsync();
+    if (status !== 'granted') {
+      alert('Camera permission is required!');
+      return;
+    }
+
+    const result = await ImagePicker.launchCameraAsync({
+      base64: true,
+      quality: 0.6,
+    });
+
+    if (!result.canceled && result.assets?.[0]?.base64) {
+      const photoData = result.assets[0];
+      setPhoto(photoData);
+      sendToBackend(photoData.base64);
     }
   };
 
-  if (hasPermission === null) return <View />;
-  if (hasPermission === false) return <Text>No access to camera</Text>;
-
-  return (
-    <View style={styles.container}>
-      <CameraView
-        style={styles.camera}
-        facing={CameraType.Back}
-      >
-        <View style={styles.overlay}>
-          <Text style={styles.prompt}>{prompt}</Text>
-
-          <TouchableOpacity style={styles.button} onPress={takePicture}>
-            <Text style={styles.buttonText}>📷 Capture</Text>
-          </TouchableOpacity>
-        </View>
-      </CameraView>
-    </View>
-  );
-}
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  camera: {
-    flex: 1,
-  },
-  overlay: {
-    flex: 1,
-    backgroundColor: 'transparent',
-    justifyContent: 'space-between',
-    padding: 20,
-  },
-  prompt: {
-    fontSize: 24,
-    color: '#fff',
-    textAlign: 'center',
-    marginTop: 50,
-    backgroundColor: '#00000080',
-    padding: 12,
-    borderRadius: 10,
-  },
-  button: {
-    backgroundColor: '#2f5d50',
-    padding: 14,
-    borderRadius: 12,
-    alignItems: 'center',
-    alignSelf: 'center',
-    marginBottom: 40,
-  },
-  buttonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '600',
-  },
-});
-import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Alert } from 'react-native';
-import { CameraView, CameraType } from 'expo-camera';
-
-const prompts = [
-  "Find something red",
-  "Show me a flower",
-  "Point to the sky",
-  "Find something soft",
-  "Find something green",
-  "Find something round",
-  "Show me a cloud",
-  "Find something that smells good",
-];
-
-export default function Grounding() {
-  const [hasPermission, setHasPermission] = useState(null);
-  const [prompt, setPrompt] = useState('');
-
-  useEffect(() => {
-    (async () => {
-      const { status } = await CameraView.requestCameraPermissionsAsync();
-      setHasPermission(status === 'granted');
-    })();
-    generateNewPrompt();
-  }, []);
-
-  const generateNewPrompt = () => {
-    const random = prompts[Math.floor(Math.random() * prompts.length)];
-    setPrompt(random);
-  };
-
-  const takePicture = async () => {
+  const sendToBackend = async (base64) => {
+    setLoading(true);
     try {
-      Alert.alert("Photo captured!", "You found something real! Great job grounding. 🌱");
-      generateNewPrompt(); // Give a new task
-    } catch (e) {
-      console.error(e);
-      Alert.alert("Error", "Could not take photo.");
+      console.log('📤 Sending image to backend...', promptChars);//192.168.128.1
+      const res = await fetch('https://bitcamp2025-1.onrender.com/analyze-image', {//http://172.23.28.11:3001/analyze-image
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          base64,
+          promptChars,
+        }),
+      });
+
+      const data = await res.json();
+      console.log('✅ Response from backend:', data);
+      setResponseText(data.result || 'No response from AI.');
+    } catch (err) {
+      console.error('Error:', err);
+      Alert.alert('Error', 'Failed to reach the server.');
+    } finally {
+      setLoading(false);
     }
   };
 
-  if (hasPermission === null) return <View />;
-  if (hasPermission === false) return <Text>No access to camera</Text>;
-
   return (
-    <View style={styles.container}>
-      <CameraView
-        style={styles.camera}
-        facing={CameraType.Back}
-      >
-        <View style={styles.overlay}>
-          <Text style={styles.prompt}>{prompt}</Text>
+    <ImageBackground
+    source={require('../assets/magglass.png')}  // adjust path if needed
+    style={styles.background}
+    resizeMode="contain"
+  >
+    <View style={styles.overlay}>
+      <Text style={styles.title}>Find something {promptChars}!</Text>
 
-          <TouchableOpacity style={styles.button} onPress={takePicture}>
-            <Text style={styles.buttonText}>📷 Capture</Text>
+      {photo && (
+        <Image source={{ uri: photo.uri }} style={styles.preview} />
+      )}
+
+      <TouchableOpacity style={styles.button} onPress={takePhoto}>
+        <Text style={styles.buttonText}>📸 Take Photo</Text>
+      </TouchableOpacity>
+
+      {loading && <ActivityIndicator size="large" color="#2f5d50" />}
+
+      {responseText && (
+        <View style={styles.responseBox}>
+          <Text style={styles.responseText}>{responseText}</Text>
+          <TouchableOpacity onPress={randomizePrompt} style={styles.retryButton}>
+            <Text style={styles.retryText}>🔁 Try Another</Text>
           </TouchableOpacity>
         </View>
-      </CameraView>
+      )}
     </View>
+    </ImageBackground>
   );
-}
+};
 
 const styles = StyleSheet.create({
-  container: {
+  background: {
     flex: 1,
-    backgroundColor: '#000',
-  },
-  camera: {
-    flex: 1,
+    width: '100%',
+    height: '100%',
   },
   overlay: {
     flex: 1,
-    backgroundColor: 'transparent',
-    justifyContent: 'space-between',
-    padding: 20,
+    backgroundColor: 'rgba(234, 250, 241, 0.85)', // optional: adds a soft tint for readability
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
   },
-  prompt: {
+  container: {
+    flex: 1,
+    backgroundColor: '#eafaf1',
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 24,
+  },
+  title: {
     fontSize: 24,
-    color: '#fff',
-    textAlign: 'center',
-    marginTop: 50,
-    backgroundColor: '#00000080',
-    padding: 12,
-    borderRadius: 10,
+    fontWeight: 'bold',
+    color: '#2f5d50',
+    marginBottom: 20,
   },
   button: {
-    backgroundColor: '#2f5d50',
-    padding: 14,
+    backgroundColor: '#a8dbc3',
+    paddingVertical: 14,
+    paddingHorizontal: 30,
     borderRadius: 12,
-    alignItems: 'center',
-    alignSelf: 'center',
-    marginBottom: 40,
+    marginVertical: 10,
   },
   buttonText: {
-    color: '#fff',
     fontSize: 18,
+    color: '#1e3d34',
+    fontWeight: '600',
+  },
+  preview: {
+    width: '90%',
+    height: 300,
+    borderRadius: 12,
+    marginBottom: 20,
+  },
+  responseBox: {
+    marginTop: 20,
+    padding: 16,
+    backgroundColor: '#fff',
+    borderRadius: 12,
+    width: '100%',
+    shadowColor: '#000',
+    shadowOpacity: 0.1,
+    shadowOffset: { width: 0, height: 2 },
+    shadowRadius: 6,
+    elevation: 3,
+  },
+  responseText: {
+    fontSize: 16,
+    color: '#2f5d50',
+  },
+  retryButton: {
+    marginTop: 10,
+    alignSelf: 'flex-end',
+  },
+  retryText: {
+    color: '#1e3d34',
     fontWeight: '600',
   },
 });
+
+export default GroundingAI;
+

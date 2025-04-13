@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { View, Text, TextInput, Button, StyleSheet, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, ScrollView, Alert} from 'react-native';
+import BackButton from '../assets/Backbutton'
 
-export default function JournalScreen() {
+export default function JournalScreen({ navigation }) {
 
   
   const [entry, setEntry] = useState('');
@@ -28,11 +29,13 @@ export default function JournalScreen() {
 
       const fullResponse = data.message || 'No analysis returned.';
 
+      console.log('🔍 Gemini full response:\n', fullResponse);
+
       const supportiveMatch = fullResponse.match(/\*Supportive Message:\*(.*?)($|\*|$)/s);
       const supportiveMessage = supportiveMatch ? supportiveMatch[1].trim() : fullResponse;
 
       
-      const moodMatch = fullResponse.match(/\*Mood Score:\*\s*([-\d.]+)/);
+      const moodMatch = fullResponse.match(/\*Mood Score:\*\s*([+-]?\d+(\.\d+)?)/);      
       const moodScore = moodMatch ? parseFloat(moodMatch[1]) : 0;
 
       setResponse(supportiveMessage || 'No analysis returned.');
@@ -76,74 +79,111 @@ export default function JournalScreen() {
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
-      
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
-        <ScrollView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <View style={{ flex: 1 }}>
+        {/* 🔝 Top header area with background + back button */}
+        <View style={styles.header}>
+          <BackButton navigation={navigation} to="JournalCalendar" />
+        </View>
+  
+        {/* 📜 Scrollable content starts below the header */}
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+          <ScrollView
             contentContainerStyle={styles.scrollContainer}
             keyboardShouldPersistTaps="handled"
-        >
-        <View style={styles.container}>
-          <Text style={styles.title}>📝 Write Your Journal</Text>
-
-          <TextInput
-            style={styles.input}
-            placeholder="How are you feeling today?"
-            value={entry}
-            onChangeText={setEntry}
-            multiline
-            textAlignVertical="top"
-          />
-
-          <Button
-            title={loading ? 'Analyzing...' : 'Submit Entry'}
-            onPress={submitEntry}
-          />
-          <Button
-            title="🗑️ Clear All Logs (Demo Only)"
-            color="red"
-            onPress={clearAllEntries}
-          />
-
-          {response ? (
-            <Text style={styles.response}>{response}</Text>
-          ) : null}
-        </View>
-        </ScrollView>
-      </TouchableWithoutFeedback>
+          >
+            <View style={styles.container}>
+              <Text style={styles.title}>📝 Write Your Journal</Text>
+  
+              <TextInput
+                style={styles.input}
+                placeholder="How are you feeling today?"
+                value={entry}
+                onChangeText={setEntry}
+                multiline
+                textAlignVertical="top"
+              />
+  
+              <Button
+                title={loading ? 'Analyzing...' : 'Submit Entry'}
+                onPress={submitEntry}
+              />
+              <Button
+                title="🗑️ Clear All Logs (Demo Only)"
+                color="red"
+                onPress={clearAllEntries}
+              />
+  
+              {response ? (
+                <Text style={styles.response}>{response}</Text>
+              ) : null}
+            </View>
+          </ScrollView>
+        </TouchableWithoutFeedback>
+      </View>
     </KeyboardAvoidingView>
   );
 }
 
 
 const styles = StyleSheet.create({
-    container: {
-      flex: 1,
-      backgroundColor: '#eafaf1',
-      padding: 20,
-      justifyContent: 'center',
-    },
+    header: {
+        height: 100,
+        backgroundColor: '#14532D', // 🌱 soft mint or pick any aesthetic tone
+        justifyContent: 'center',
+        paddingHorizontal: 20,
+        paddingTop: Platform.OS === 'ios' ? 50 : 20,
+        zIndex: 10,
+        elevation: 5,
+      },
+      scrollContainer: {
+        flexGrow: 1,
+        paddingBottom: 0,
+      },
+      container: {
+        flex: 1,
+        backgroundColor: '#fffaf3',
+        paddingHorizontal: 20,
+        paddingTop: 30, // space below header
+      },
+    
     title: {
-      fontSize: 22,
-      fontWeight: '600',
-      marginBottom: 12,
-      color: '#2f5d50',
+      paddingTop: 10,
+      fontSize: 26,
+      fontWeight: '700',
+      marginBottom: 20,
+      color: '#14532D',
       textAlign: 'center',
     },
     input: {
-      backgroundColor: '#fff',
-      borderRadius: 8,
-      padding: 14,
+      backgroundColor: '#fffaf3',
+      borderRadius: 12,
+      borderColor: '#ddd',
+      borderWidth: 1.5,
+      padding: 20,
       fontSize: 16,
-      minHeight: 120,
-      marginBottom: 12,
-      borderColor: '#ccc',
-      borderWidth: 1,
+      minHeight: 180,
+      textAlignVertical: 'top',
+      marginBottom: 20,
+      color: '#333',
+      shadowColor: '#000',
+      shadowOpacity: 0.05,
+      shadowOffset: { width: 0, height: 2 },
+      shadowRadius: 4,
+      elevation: 3,
     },
     response: {
-      marginTop: 20,
+      marginTop: 40,
       fontSize: 16,
-      color: '#3d5347',
+      color: '#2f5d50',
       fontStyle: 'italic',
+      backgroundColor: '#CDE7B0',
+      padding: 14,
+      borderRadius: 10,
+      borderColor: '#14532D',
+      borderWidth: 1,
     },
   });
+  
+  

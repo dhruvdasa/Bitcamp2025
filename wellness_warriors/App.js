@@ -2,59 +2,79 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+
+// Screens
 import JournalScreen from './screens/Journal';
-import JournalCalendarScreen from './screens/JournalCalendar';
+import SleepTrackerScreen from './screens/SleepTracker';
 import Grounding from './screens/Grounding';
 import TrendReportScreen from './screens/TrendReportScreen';
+import FlowerScreen from './screens/FlowerGallery';
 
+// Context
+import { PetalProvider } from './contexts/PetalContext';
 
-const SleepScreen = () => <Screen title="😴 Sleep Tracker" />;
 const HallucinationScreen = () => <Screen title="👁️ Hallucination Breaker" />;
-
 const Stack = createNativeStackNavigator();
 
 export default function App() {
   return (
-    <NavigationContainer>
-      <Stack.Navigator initialRouteName="Home" screenOptions={{ headerShown: true, headerStyle: { backgroundColor: '#a7d7c5' } }}>
-      <Stack.Screen name="Home" component={HomeScreen} />
-      <Stack.Screen name="JournalCalendar" component={JournalCalendarScreen} />
-      <Stack.Screen name="Journal" component={JournalScreen} />
-      <Stack.Screen name="TrendReport" component={TrendReportScreen} options={{ title: 'Trend Report' }} />
-      <Stack.Screen name="Sleep" component={SleepScreen} />
-      <Stack.Screen name="Hallucination" component={HallucinationScreen} />
-      <Stack.Screen name="Grounding" component={Grounding} />
-      </Stack.Navigator>
-    </NavigationContainer>
+    <PetalProvider>
+      <NavigationContainer>
+        <Stack.Navigator
+          initialRouteName="Home"
+          screenOptions={{
+            headerShown: true,
+            headerStyle: { backgroundColor: '#a7d7c5' },
+          }}
+        >
+          <Stack.Screen name="Home" component={HomeScreen} />
+          <Stack.Screen name="Journal" component={JournalScreen} />
+          <Stack.Screen name="Sleep" component={SleepTrackerScreen} />
+          <Stack.Screen name="Grounding" component={Grounding} />
+          <Stack.Screen name="TrendReport" component={TrendReportScreen} options={{ title: 'Trend Report' }} />
+          <Stack.Screen name="FlowerScreen" component={FlowerScreen} />
+          <Stack.Screen name="Hallucination" component={HallucinationScreen} />
+        </Stack.Navigator>
+      </NavigationContainer>
+    </PetalProvider>
   );
 }
 
+// --- Home Screen with proper navigation ---
 const HomeScreen = ({ navigation }) => {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Welcome 🌼</Text>
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('JournalCalendar')}>
+
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Journal')}>
         <Text style={styles.buttonText}>📝 Journal</Text>
       </TouchableOpacity>
+
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Sleep')}>
         <Text style={styles.buttonText}>😴 Sleep Tracker</Text>
       </TouchableOpacity>
+
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Hallucination')}>
         <Text style={styles.buttonText}>👁️ Hallucination Breaker</Text>
       </TouchableOpacity>
+
       <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Grounding')}>
         <Text style={styles.buttonText}>🌱 Grounding Tool</Text>
       </TouchableOpacity>
+
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TrendReport')}>
+        <Text style={styles.buttonText}>📊 Weekly Trends</Text>
+      </TouchableOpacity>
+
+      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('FlowerScreen')}>
+        <Text style={styles.buttonText}>Flower Screen</Text>
+      </TouchableOpacity>
+
     </View>
   );
 };
 
-const Screen = ({ title }) => (
-  <View style={styles.screenContainer}>
-    <Text style={styles.screenText}>{title}</Text>
-  </View>
-);
-
+// --- Styles ---
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -87,16 +107,5 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: '#1e3d34',
     fontWeight: '600',
-  },
-  screenContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#eafaf1',
-  },
-  screenText: {
-    fontSize: 24,
-    color: '#2f5d50',
-    fontWeight: 'bold',
   },
 });

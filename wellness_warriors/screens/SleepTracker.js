@@ -14,8 +14,10 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import JournalCalendar from '../components/JournalCalendar';
+import BackButton from '../assets/Backbutton'
 
-export default function SleepTrackerScreen() {
+
+export default function SleepTrackerScreen({navigation}) {
   const [bedTime, setBedTime] = useState(null);
   const [wakeTime, setWakeTime] = useState(null);
   const [qualityRating, setQualityRating] = useState('');
@@ -84,7 +86,12 @@ export default function SleepTrackerScreen() {
     <KeyboardAvoidingView
       style={{ flex: 1 }}
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    
     >
+    {/* 🔝 Top header area with background + back button */}
+    <View style={styles.backheader}>
+        <BackButton navigation={navigation} to="Home" />
+    </View>
       <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
         <ScrollView contentContainerStyle={styles.scrollContainer} keyboardShouldPersistTaps="handled">
           <View style={styles.container}>
@@ -147,6 +154,15 @@ export default function SleepTrackerScreen() {
 }
 
 const styles = StyleSheet.create({
+  backheader: {
+    height: 100,
+    backgroundColor: '#191970', // 🌱 soft mint or pick any aesthetic tone
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 50 : 20,
+    zIndex: 10,
+    elevation: 5,
+  },
   scrollContainer: {
     flexGrow: 1,
   },

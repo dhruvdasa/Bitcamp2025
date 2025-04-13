@@ -8,6 +8,7 @@ import JournalScreen from './screens/Journal';
 import SleepTrackerScreen from './screens/SleepTracker';
 import Grounding from './screens/Grounding';
 import TrendReportScreen from './screens/TrendReportScreen'
+import Diary from './screens/Diary'
 import { Image } from 'react-native'
 import Panic from './screens/Panic'
 
@@ -26,7 +27,7 @@ export default function App() {
         <Stack.Navigator
           initialRouteName="Home"
           screenOptions={{
-            headerShown: true,
+            headerShown: false,
             headerStyle: { backgroundColor: '#a7d7c5' },
           }}
         >
@@ -35,7 +36,9 @@ export default function App() {
           <Stack.Screen name="Sleep" component={SleepTrackerScreen} />
           <Stack.Screen name="Grounding" component={Grounding} />
           <Stack.Screen name="TrendReport" component={TrendReportScreen} options={{ title: 'Trend Report' }} />
+          <Stack.Screen name="Diary" component={Diary} options={{ title: 'New Journal Entry' }} />
           <Stack.Screen name="FlowerScreen" component={FlowerScreen} />
+          <Stack.Screen name="Panic" component={Panic} />
           <Stack.Screen name="Hallucination" component={HallucinationScreen} />
         </Stack.Navigator>
       </NavigationContainer>
@@ -52,7 +55,7 @@ const HomeScreen = ({ navigation }) => {
 
       {/* Bottom nav bar */}
       <View style={styles.navBar}>
-        <TouchableOpacity onPress={() => navigation.navigate('JournalCalendar')}>
+        <TouchableOpacity onPress={() => navigation.navigate('Journal')}>
           <Image source={require('./assets/Journal.png')} style={styles.icon} />
         </TouchableOpacity>
         <TouchableOpacity onPress={() => navigation.navigate('Sleep')}>
@@ -64,38 +67,13 @@ const HomeScreen = ({ navigation }) => {
         <TouchableOpacity onPress={() => navigation.navigate('Grounding')}>
           <Image source={require('./assets/Grounding.png')} style={styles.icon} />
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => navigation.navigate('FlowerGarden')}>
+        <TouchableOpacity onPress={() => navigation.navigate('FlowerScreen')}>
           <Image source={require('./assets/FlowerGarden.png')} style={styles.icon} />
         </TouchableOpacity>
         
       </View>
-      <Text style={styles.title}>Welcome 🌼</Text>
 
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Journal')}>
-        <Text style={styles.buttonText}>📝 Journal</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Sleep')}>
-        <Text style={styles.buttonText}>😴 Sleep Tracker</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Hallucination')}>
-        <Text style={styles.buttonText}>👁️ Hallucination Breaker</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('Grounding')}>
-        <Text style={styles.buttonText}>🌱 Grounding Tool</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TrendReport')}>
-        <Text style={styles.buttonText}>📊 Weekly Trends</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('FlowerScreen')}>
-        <Text style={styles.buttonText}>Flower Screen</Text>
-      </TouchableOpacity>
-
-    </View>
+      </View>
   );
 };
 

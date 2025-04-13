@@ -1,7 +1,9 @@
 // --- FlowerGallery.js ---
 import React, { useEffect, useState } from 'react';
-import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, Animated, ImageBackground } from 'react-native';
+import { View, Text, Image, StyleSheet, FlatList, TouchableOpacity, Animated, ImageBackground, Platform } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import BackButton from '../assets/Backbutton'
+
 
 const flowerData = [
   { name: 'Daisy', petals: 0 },
@@ -26,7 +28,7 @@ const flowerImages = {
   seed: require('../assets/flowers/seed.png'),
 };
 
-export default function FlowerGallery() {
+export default function FlowerGallery( {navigation }) {
   const [petals, setPetals] = useState(0);
   const [animations, setAnimations] = useState([]);
 
@@ -77,11 +79,16 @@ export default function FlowerGallery() {
   };
 
   return (
+    
     <ImageBackground
       source={require('../assets/flowers/background.png')}
       style={styles.background}
       resizeMode="cover"
     >
+    {/* 🔝 Top header area with background + back button */}
+        <View style={styles.header}>
+            <BackButton navigation={navigation} to="Home" />
+        </View>
       <View style={styles.overlay}>
         <Text style={styles.title}>🌼 Flower Garden</Text>
         <Text style={styles.subtitle}>Petals: {petals}</Text>
@@ -98,6 +105,15 @@ export default function FlowerGallery() {
 }
 
 const styles = StyleSheet.create({
+ header: {
+        height: 100,
+        backgroundColor: '#14532D', // 🌱 soft mint or pick any aesthetic tone
+        justifyContent: 'center',
+        paddingHorizontal: 20,
+        paddingTop: Platform.OS === 'ios' ? 50 : 20,
+        zIndex: 10,
+        elevation: 5,
+  },
   background: { flex: 1, width: '100%', height: '100%' },
   overlay: { flex: 1, backgroundColor: 'rgba(255,255,255,0.85)', padding: 20 },
   title: { fontSize: 24, fontWeight: 'bold', textAlign: 'center', color: '#3b3b3b' },

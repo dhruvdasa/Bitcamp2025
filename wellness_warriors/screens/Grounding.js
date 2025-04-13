@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Alert, ActivityIndicator, Platform } from 'react-native';
 import { ImageBackground } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import BackButton from '../assets/Backbutton'
 
 const prompts = ['orange', 'blue', 'gray', 'magenta', 'purple', 'round', 'smooth', 'multi-colored'];
 
-const GroundingAI = () => {
+const GroundingAI = ({navigation}) => {
   const [promptChars, setPromptChars] = useState(null);
   const [photo, setPhoto] = useState(null);
   const [responseText, setResponseText] = useState(null);
@@ -71,7 +72,12 @@ const GroundingAI = () => {
     style={styles.background}
     resizeMode="contain"
   >
+    {/* 🔝 Top header area with background + back button */}
+    <View style={styles.header}>
+        <BackButton navigation={navigation} to="Home" />
+     </View>
     <View style={styles.overlay}>
+    
       <Text style={styles.title}>Find something {promptChars}!</Text>
 
       {photo && (
@@ -98,6 +104,15 @@ const GroundingAI = () => {
 };
 
 const styles = StyleSheet.create({
+  header: {
+    height: 100,
+    backgroundColor: '#14532D', // 🌱 soft mint or pick any aesthetic tone
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+    paddingTop: Platform.OS === 'ios' ? 50 : 20,
+    zIndex: 10,
+    elevation: 5,
+  },
   background: {
     flex: 1,
     width: '100%',

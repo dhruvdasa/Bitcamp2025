@@ -1,52 +1,35 @@
-// --- Journal.js ---
 import React, { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import {
-  View,
-  Text,
-  TextInput,
-  Button,
-  StyleSheet,
-  KeyboardAvoidingView,
-  Platform,
-  Modal,
-  TouchableOpacity,
-  TouchableWithoutFeedback,
-  Keyboard,
-  ScrollView,
-  Alert,
-} from 'react-native';
-import { usePetals } from '../contexts/PetalContext';
-import JournalCalendar from '../components/JournalCalendar';
+import { View, Text, TextInput, Button, StyleSheet, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, ScrollView, Alert} from 'react-native';
 import BackButton from '../assets/Backbutton'
 
-export default function JournalScreen({ navigation }) {
+export default function Diary({navigation}){
 
-  
-  const [entry, setEntry] = useState('');
-  const [response, setResponse] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [selectedDate, setSelectedDate] = useState(null);
-  const { add } = usePetals();
+    const [entry, setEntry] = useState('');
+    const [response, setResponse] = useState('');
+    const [loading, setLoading] = useState(false);
 
-  const submitEntry = async () => {
-    if (!entry.trim())
-      return Alert.alert("Empty Entry", "Please write something before submitting.");
+
+    const submitEntry = async () => {
+    if (!entry.trim()) return Alert.alert("Empty Entry", "Please write something before submitting.");
 
     setLoading(true);
     const timestamp = new Date().toISOString();
-    const date = timestamp.split('T')[0];           // e.g., "2025-04-12"
-    const time = timestamp.split('T')[1].slice(0, 8); // e.g., "22:31:00"
+    const date = timestamp.split('T')[0];           // "2025-04-12"
+    const time = timestamp.split('T')[1].slice(0, 8); // "22:31:00"
 
     try {
       const res = await fetch('https://backend.shreyasbachu1355.workers.dev', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entry, timestamp }),
+        body: JSON.stringify({ entry, timestamp })
       });
 
       const data = await res.json();
+
       const fullResponse = data.message || 'No analysis returned.';
+
+      console.log('🔍 Gemini full response:\n', fullResponse);
 
       const supportiveMatch = fullResponse.match(/\*Supportive Message:\*(.*?)($|\*|$)/s);
       const supportiveMessage = supportiveMatch ? supportiveMatch[1].trim() : fullResponse;
@@ -56,20 +39,21 @@ export default function JournalScreen({ navigation }) {
       const moodScore = moodMatch ? parseFloat(moodMatch[1]) : 0;
 
       setResponse(supportiveMessage || 'No analysis returned.');
-
+      const message = data.message
+    
       const storageKey = `entry-${date}-${time}`;
       const savedData = {
         entry,
         moodScore,
         timestamp,
         fullResponse,
-        supportiveMessage,
+        supportiveMessage, // AI response
       };
 
       await AsyncStorage.setItem(storageKey, JSON.stringify(savedData));
       console.log('Entry saved:', storageKey);
 
-      await add(1); // 🌸 Reward petal for journaling
+      setResponse(supportiveMessage);
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Something went wrong submitting your journal.');
@@ -92,12 +76,6 @@ export default function JournalScreen({ navigation }) {
     }
   };
 
-  const handleDateSelect = (day) => {
-    setSelectedDate(day.dateString);
-    console.log("Selected date:", day.dateString);
-    // You can optionally filter/display logs from AsyncStorage for this day
-  };
-
   return (
     <KeyboardAvoidingView
       style={{ flex: 1 }}
@@ -106,20 +84,9 @@ export default function JournalScreen({ navigation }) {
       <View style={{ flex: 1 }}>
         {/* 🔝 Top header area with background + back button */}
         <View style={styles.header}>
-          <BackButton navigation={navigation} to="Home" />
+          <BackButton navigation={navigation} to="Journal" />
         </View>
-        
-        <TouchableOpacity
-        style={styles.button}
-        onPress={() => navigation.navigate('Diary')}
-      >
-        <Text style={styles.buttonText}>➕ New Entry</Text>
-      </TouchableOpacity>
-
-      <TouchableOpacity style={styles.button} onPress={() => navigation.navigate('TrendReport')}>
-         <Text style={styles.buttonText}>📊 Weekly Report</Text>
-      </TouchableOpacity>
-
+  
         {/* 📜 Scrollable content starts below the header */}
         <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
           <ScrollView
@@ -127,12 +94,30 @@ export default function JournalScreen({ navigation }) {
             keyboardShouldPersistTaps="handled"
           >
             <View style={styles.container}>
-
-
-               <JournalCalendar
-                  onDateSelect={handleDateSelect}
-                  selectedDate={selectedDate}
-                />
+              <Text style={styles.title}>📝 Write Your Journal</Text>
+  
+              <TextInput
+                style={styles.input}
+                placeholder="How are you feeling today?"
+                value={entry}
+                onChangeText={setEntry}
+                multiline
+                textAlignVertical="top"
+              />
+  
+              <Button
+                title={loading ? 'Analyzing...' : 'Submit Entry'}
+                onPress={submitEntry}
+              />
+              <Button
+                title="🗑️ Clear All Logs (Demo Only)"
+                color="red"
+                onPress={clearAllEntries}
+              />
+  
+              {response ? (
+                <Text style={styles.response}>{response}</Text>
+              ) : null}
             </View>
           </ScrollView>
         </TouchableWithoutFeedback>
@@ -141,8 +126,9 @@ export default function JournalScreen({ navigation }) {
   );
 }
 
+
 const styles = StyleSheet.create({
-      header: {
+    header: {
         height: 100,
         backgroundColor: '#14532D', // 🌱 soft mint or pick any aesthetic tone
         justifyContent: 'center',
@@ -169,18 +155,6 @@ const styles = StyleSheet.create({
       marginBottom: 20,
       color: '#14532D',
       textAlign: 'center',
-    },
-    button: {
-      backgroundColor: '#14532D',
-      padding: 15,
-      borderRadius: 10,
-      marginTop: 20,
-      alignItems: 'center',
-    },
-    buttonText: {
-      color: '#ffffff',
-      fontSize: 16,
-      fontWeight: '600',
     },
     input: {
       backgroundColor: '#fffaf3',
@@ -210,8 +184,4 @@ const styles = StyleSheet.create({
       borderColor: '#14532D',
       borderWidth: 1,
     },
-
-       
   });
-  
-  

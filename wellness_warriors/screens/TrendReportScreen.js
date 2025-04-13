@@ -58,7 +58,7 @@ export default function TrendReportScreen({ navigation }) {
       <View style={styles.wrapper}>
         {/* Top Header */}
         <View style={styles.header}>
-          <BackButton navigation={navigation} to="JournalCalendar" />
+          <BackButton navigation={navigation} to="Journal" />
         </View>
   
         <ScrollView contentContainerStyle={styles.scrollContainer}>

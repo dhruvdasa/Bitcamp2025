@@ -1,6 +1,21 @@
+// --- Journal.js ---
 import React, { useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { View, Text, TextInput, Button, StyleSheet, KeyboardAvoidingView, Platform, TouchableWithoutFeedback, Keyboard, ScrollView, Alert} from 'react-native';
+import {
+  View,
+  Text,
+  TextInput,
+  Button,
+  StyleSheet,
+  KeyboardAvoidingView,
+  Platform,
+  TouchableWithoutFeedback,
+  Keyboard,
+  ScrollView,
+  Alert,
+} from 'react-native';
+import { usePetals } from '../contexts/PetalContext';
+import JournalCalendar from '../components/JournalCalendar';
 import BackButton from '../assets/Backbutton'
 
 export default function JournalScreen({ navigation }) {
@@ -9,24 +24,26 @@ export default function JournalScreen({ navigation }) {
   const [entry, setEntry] = useState('');
   const [response, setResponse] = useState('');
   const [loading, setLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState(null);
+  const { add } = usePetals();
 
   const submitEntry = async () => {
-    if (!entry.trim()) return Alert.alert("Empty Entry", "Please write something before submitting.");
+    if (!entry.trim())
+      return Alert.alert("Empty Entry", "Please write something before submitting.");
 
     setLoading(true);
     const timestamp = new Date().toISOString();
-    const date = timestamp.split('T')[0];           // "2025-04-12"
-    const time = timestamp.split('T')[1].slice(0, 8); // "22:31:00"
+    const date = timestamp.split('T')[0];           // e.g., "2025-04-12"
+    const time = timestamp.split('T')[1].slice(0, 8); // e.g., "22:31:00"
 
     try {
       const res = await fetch('https://backend.shreyasbachu1355.workers.dev', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ entry, timestamp })
+        body: JSON.stringify({ entry, timestamp }),
       });
 
       const data = await res.json();
-
       const fullResponse = data.message || 'No analysis returned.';
 
       console.log('🔍 Gemini full response:\n', fullResponse);
@@ -39,21 +56,20 @@ export default function JournalScreen({ navigation }) {
       const moodScore = moodMatch ? parseFloat(moodMatch[1]) : 0;
 
       setResponse(supportiveMessage || 'No analysis returned.');
-      const message = data.message
-    
+
       const storageKey = `entry-${date}-${time}`;
       const savedData = {
         entry,
         moodScore,
         timestamp,
         fullResponse,
-        supportiveMessage, // AI response
+        supportiveMessage,
       };
 
       await AsyncStorage.setItem(storageKey, JSON.stringify(savedData));
       console.log('Entry saved:', storageKey);
 
-      setResponse(supportiveMessage);
+      await add(1); // 🌸 Reward petal for journaling
     } catch (error) {
       console.error(error);
       Alert.alert('Error', 'Something went wrong submitting your journal.');
@@ -74,6 +90,12 @@ export default function JournalScreen({ navigation }) {
       console.error('Error clearing AsyncStorage:', err);
       Alert.alert('Error', 'Could not clear saved logs.');
     }
+  };
+
+  const handleDateSelect = (day) => {
+    setSelectedDate(day.dateString);
+    console.log("Selected date:", day.dateString);
+    // You can optionally filter/display logs from AsyncStorage for this day
   };
 
   return (
@@ -125,7 +147,6 @@ export default function JournalScreen({ navigation }) {
     </KeyboardAvoidingView>
   );
 }
-
 
 const styles = StyleSheet.create({
     header: {

@@ -26,12 +26,12 @@ function base64ToGenerativePart(base64, mimeType) {
 app.post('/analyze-image', async (req, res) => {
   try {
     console.log('🧠 Received request to /analyze-image');
-    const { base64, promptColor } = req.body;
-    console.log('➡️ Color:', promptColor);
+    const { base64, promptChars } = req.body;
+    console.log('➡️ Characteristic:', promptChars);
     console.log('🖼️ Image received:', base64?.substring(0, 50), '...');
     const model = genAI.getGenerativeModel({ model: 'gemini-1.5-pro' });
 
-    const prompt = `First of all, I want you to identify the main object in the image (ignore background). Is this object primarily something of the color ${promptColor} (not just the word)? Answer yes or no with a short reason. If the answer is no, but the object still features the color in some way, make that clear in your response.`;
+    const prompt = `First of all, I want you to identify the main object in the image (ignore background). Is this object primarily something of the characteristic ${promptChars}? Answer yes or no with a short reason.`;
 
     const imagePart = base64ToGenerativePart(base64, 'image/jpeg');
 
